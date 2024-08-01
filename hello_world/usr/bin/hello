@@ -1,0 +1,65 @@
+#!/usr/bin/env python3
+
+import sqlite3
+import os
+
+DB_FILE = '/usr/share/hello-world/hello.db'
+
+def create_database():
+    try:
+        # Check if the database file exists
+        if not os.path.exists(DB_FILE):
+            print("Creating database...")
+            conn = sqlite3.connect(DB_FILE)
+            cursor = conn.cursor()
+            cursor.execute('''
+                CREATE TABLE greetings (
+                    id INTEGER PRIMARY KEY AUTOINCREMENT,
+                    message TEXT
+                )
+            ''')
+            cursor.execute('''
+                INSERT INTO greetings (message) VALUES ('Hello, World!')
+            ''')
+            conn.commit()
+            conn.close()
+            print("Database and table created successfully.")
+        else:
+            print("Database file already exists.")
+            
+            conn = sqlite3.connect(DB_FILE)
+            cursor = conn.cursor()  
+            cursor.execute('''
+                CREATE TABLE greetings (
+                    id INTEGER PRIMARY KEY AUTOINCREMENT,
+                    message TEXT
+                )
+            ''')                     
+            cursor.execute('''
+                INSERT INTO greetings (message) VALUES ('Hello, World!, add database')
+            ''')
+            conn.commit()
+            print("try to insert data.",conn)
+            conn.close()
+            
+    except Exception as e:
+        print(f"An error occurred while creating the database: {e}")
+
+def read_message():
+    try:
+        conn = sqlite3.connect(DB_FILE)
+        cursor = conn.cursor()
+        cursor.execute('SELECT message FROM greetings ORDER BY id DESC LIMIT 1')
+        message = cursor.fetchone()
+        conn.close()
+        return message[0] if message else 'No message found'
+    except Exception as e:
+        print(f"An error occurred while reading the message: {e}")
+        return 'Error reading message'
+
+def main():
+    create_database()
+    print(read_message())
+
+if __name__ == "__main__":
+    main()

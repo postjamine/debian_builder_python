@@ -1,0 +1,99 @@
+1. Update the Python Application
+Modify your hello.py to interact with an SQLite3 database. Here’s an updated version of hello.py that creates a database, adds a table, and inserts a row:
+
+python
+คัดลอกโค้ด
+#!/usr/bin/env python3
+
+import sqlite3
+import os
+
+DB_FILE = '/usr/share/hello-world/hello.db'
+
+def create_database():
+    if not os.path.exists(DB_FILE):
+        conn = sqlite3.connect(DB_FILE)
+        cursor = conn.cursor()
+        cursor.execute('''
+            CREATE TABLE greetings (
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                message TEXT
+            )
+        ''')
+        cursor.execute('''
+            INSERT INTO greetings (message) VALUES ('Hello, World!')
+        ''')
+        conn.commit()
+        conn.close()
+
+def read_message():
+    conn = sqlite3.connect(DB_FILE)
+    cursor = conn.cursor()
+    cursor.execute('SELECT message FROM greetings ORDER BY id DESC LIMIT 1')
+    message = cursor.fetchone()
+    conn.close()
+    return message[0] if message else 'No message found'
+
+def main():
+    create_database()
+    print(read_message())
+
+if __name__ == "__main__":
+    main()
+2. Update the Directory Structure
+Add a directory to store the SQLite database:
+
+markdown
+คัดลอกโค้ด
+hello-world/
+├── DEBIAN
+│   └── control
+├── usr
+│   ├── bin
+│   │   └── hello
+│   └── share
+│       └── hello-world
+│           └── hello.db
+└── usr
+    └── share
+        └── doc
+            └── hello-world
+                └── README
+3. Create an Empty Database File
+To ensure the database file is present, you need to create an empty database file in the correct location. However, since the script will create the database if it does not exist, you can leave it as an empty file:
+
+bash
+คัดลอกโค้ด
+touch hello-world/usr/share/hello-world/hello.db
+4. Update the control File
+No changes are needed here since the package details remain the same.
+
+5. Build the Debian Package
+Rebuild the Debian package with the updated structure:
+
+bash
+คัดลอกโค้ด
+dpkg-deb --build hello-world
+6. Install and Test
+Install the updated Debian package:
+
+bash
+คัดลอกโค้ด
+sudo dpkg -i hello-world.deb
+Run the hello command to see if it correctly interacts with the SQLite database and prints the message:
+
+bash
+คัดลอกโค้ด
+hello
+You should see:
+
+plaintext
+คัดลอกโค้ด
+Hello, World!
+This setup will now create an SQLite3 database file in /usr/share/hello-world/, create a table, insert a greeting, and then read and display that greeting when the hello command is run.
+
+
+
+
+
+

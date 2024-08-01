@@ -1,0 +1,9 @@
+Package: hello-world
+Version: 1.0
+Section: base
+Priority: optional
+Architecture: all
+Depends: python3
+Maintainer: Your Name <your.email@example.com>
+Description: A simple Hello World Python application.
+ This is a simple Python application that prints "Hello, World!".

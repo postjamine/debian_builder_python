@@ -1,0 +1,10 @@
+#!/bin/sh
+set -e
+
+# Set permissions for the database file
+chmod 664 /usr/share/hello-world/hello.db
+
+# Ensure the script is executable
+chmod 755 /usr/bin/hello
+
+exit 0
