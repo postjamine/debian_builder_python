@@ -2,8 +2,13 @@
 
 import sqlite3
 import os
+import paho.mqtt.client as mqtt
+
 
 DB_FILE = '/usr/share/hello-world/hello.db'
+MQTT_BROKER = 'localhost'  # Replace with your MQTT broker address
+MQTT_PORT = 1883
+MQTT_TOPIC = 'hello-world/topic'
 
 def create_database():
     try:
@@ -57,9 +62,49 @@ def read_message():
         print(f"An error occurred while reading the message: {e}")
         return 'Error reading message'
 
+def on_connect(client, userdata, flags, rc):
+    print(f"Connected with result code {rc}")
+    client.subscribe(MQTT_TOPIC)
+
+def on_message(client, userdata, msg):
+    print(f"Received message '{msg.payload.decode()}' on topic '{msg.topic}'")
+    # Insert received message into the database
+    try:
+        conn = sqlite3.connect(DB_FILE)
+        cursor = conn.cursor()
+        cursor.execute('''
+            INSERT INTO greetings (message) VALUES (?)
+        ''', (msg.payload.decode(),))
+        conn.commit()
+        conn.close()
+        print("Message inserted into the database.")
+    except Exception as e:
+        print(f"An error occurred while inserting the message into the database: {e}")
+
+
 def main():
     create_database()
     print(read_message())
+
+    # MQTT Setup
+    client = mqtt.Client()
+    client.on_connect = on_connect
+    client.on_message = on_message
+
+    print(f"Connecting to MQTT broker at {MQTT_BROKER}:{MQTT_PORT}")
+    client.connect(MQTT_BROKER, MQTT_PORT, 60)
+
+    # Start the MQTT client loop
+    client.loop_start()
+
+    # Keep the script running to maintain MQTT connection
+    try:
+        while True:
+            pass
+    except KeyboardInterrupt:
+        print("Exiting...")
+        client.loop_stop()
+        client.disconnect()
 
 if __name__ == "__main__":
     main()
