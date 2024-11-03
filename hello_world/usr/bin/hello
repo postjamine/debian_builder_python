@@ -54,32 +54,37 @@ def read_message():
     try:
         conn = sqlite3.connect(DB_FILE)
         cursor = conn.cursor()
-        cursor.execute('SELECT message FROM greetings ORDER BY id DESC LIMIT 1')
-        message = cursor.fetchone()
+        cursor.execute('SELECT message FROM greetings ORDER BY id DESC LIMIT 10')
+        message = cursor.fetchall()
         conn.close()
-        return message[0] if message else 'No message found'
+        return message if message else 'No message found'
     except Exception as e:
         print(f"An error occurred while reading the message: {e}")
         return 'Error reading message'
 
-def on_connect(client, userdata, flags, rc):
-    print(f"Connected with result code {rc}")
+def connect_server(client):
+    print(f"Connected with result code")
     client.subscribe(MQTT_TOPIC)
+    client.subscribe("hello-world/get-data")
 
 def on_message(client, userdata, msg):
     print(f"Received message '{msg.payload.decode()}' on topic '{msg.topic}'")
     # Insert received message into the database
-    try:
-        conn = sqlite3.connect(DB_FILE)
-        cursor = conn.cursor()
-        cursor.execute('''
-            INSERT INTO greetings (message) VALUES (?)
-        ''', (msg.payload.decode(),))
-        conn.commit()
-        conn.close()
-        print("Message inserted into the database.")
-    except Exception as e:
-        print(f"An error occurred while inserting the message into the database: {e}")
+    if msg.topic == "hello-world/topic":
+        try:
+            conn = sqlite3.connect(DB_FILE)
+            cursor = conn.cursor()
+            cursor.execute('''
+                INSERT INTO greetings (message) VALUES (?)
+            ''', (msg.payload.decode(),))
+            conn.commit()
+            conn.close()
+            print("Message inserted into the database.")
+        except Exception as e:
+            print(f"An error occurred while inserting the message into the database: {e}")
+    elif msg.topic == "hello-world/get-data":
+        print(read_message())
+
 
 
 def main():
@@ -87,13 +92,13 @@ def main():
     print(read_message())
 
     # MQTT Setup
-    client = mqtt.Client()
-    client.on_connect = on_connect
+    print("MQTT client set up")
+    client = mqtt.Client(mqtt.CallbackAPIVersion.VERSION2)    
     client.on_message = on_message
 
     print(f"Connecting to MQTT broker at {MQTT_BROKER}:{MQTT_PORT}")
     client.connect(MQTT_BROKER, MQTT_PORT, 60)
-
+    connect_server(client)
     # Start the MQTT client loop
     client.loop_start()
 

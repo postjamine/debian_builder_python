@@ -23,6 +23,7 @@ This Python application demonstrates how to integrate SQLite3 for local data sto
 
 
 dpkg-deb --build hello_world
+dpkg -c device_management.deb
 sudo dpkg -i hello_world.deb
 hello
 
