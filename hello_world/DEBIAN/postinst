@@ -1,10 +1,26 @@
 #!/bin/sh
 set -e
 
+# set share directory
+mkdir -p /usr/share/hello-world/
+
+# Excercise 2
 # Set permissions for the database file
 chmod 664 /usr/share/hello-world/hello.db
 
+# Excercise 2+3
 # Ensure the script is executable
 chmod 755 /usr/bin/hello
 
+
+# Excercise 4
+cp /usr/share/hello-world.service /etc/systemd/system/
+
+rm /usr/share/hello-world.service
+
+systemctl daemon-reload
+
+systemctl enable hello-world.service
+systemctl start hello-world.service
+systemctl restart hello-world.service
 exit 0

@@ -27,4 +27,14 @@ dpkg -c device_management.deb
 sudo dpkg -i hello_world.deb
 hello
 
+# subscribe all data
+mosquitto_sub -v -t "#"
+
+# insert String to data base
 mosquitto_pub -h localhost -t hello-world/topic -m "Hello, MQTT!"
+
+# Anoter String
+mosquitto_pub -t "hello-world/topic" -m "test12345"
+
+# Query String from database
+mosquitto_pub -t "hello-world/get-data" -m "getget"

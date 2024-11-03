@@ -4,8 +4,7 @@ import sqlite3
 import os
 import paho.mqtt.client as mqtt
 
-
-DB_FILE = '/usr/share/hello-world/hello.db'
+DB_FILE = '/usr/share/hello-world/hello.db' # indicate exact path for database
 MQTT_BROKER = 'localhost'  # Replace with your MQTT broker address
 MQTT_PORT = 1883
 MQTT_TOPIC = 'hello-world/topic'

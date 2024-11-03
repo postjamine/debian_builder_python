@@ -1,0 +1,16 @@
+[Unit]
+Description=hello world exercise
+After=network.target
+
+[Service]
+Type=simple
+Environment="VAR_NAME=value"
+RemainAfterExit=no
+Restart=on-failure
+RestartSec=10
+ExecStart=/usr/bin/python3 /usr/bin/hello
+WorkingDirectory=/usr/share/hello-world
+TimeoutStopSec=30
+
+[Install]
+WantedBy=multi-user.target
