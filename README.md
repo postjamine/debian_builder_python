@@ -29,12 +29,16 @@ hello
 
 # subscribe all data
 mosquitto_sub -v -t "#"
-
+ mosquitto_sub -v -h 'broker.hivemq.com' -t "hello-world/#"
+ 
 # insert String to data base
 mosquitto_pub -h localhost -t hello-world/topic -m "Hello, MQTT!"
+mosquitto_pub -h localhost -t hello-world/topic -m "Hello, MQTT!" -h 'broker.hivemq.com'
 
 # Anoter String
 mosquitto_pub -t "hello-world/topic" -m "test12345"
+mosquitto_pub -t "hello-world/topic" -m "test12345" -h 'broker.hivemq.com'
 
 # Query String from database
 mosquitto_pub -t "hello-world/get-data" -m "getget"
+mosquitto_pub -t "hello-world/get-data" -m "getget" -h 'broker.hivemq.com'
